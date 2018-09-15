@@ -2,34 +2,6 @@
 // Constantized API_ENPOINT
 const API_ENDPOINT = 'http://localhost:3000'
 
-// Constantized format options and desired attributes
-const EXPORT_JSON = 'JSON'
-const EXPORT_JSON_MIMETYPE = 'application/json'
-const EXPORT_CSV = 'CSV'
-const EXPORT_CSV_MIMETYPE = 'text/csv'
-const EXPORT_XML = 'XML'
-const EXPORT_XML_MIMETYPE = 'application/xml'
-
-// Array of attribute names to be exported
-const EXPORT_ATTRS = [
-  "created_at",
-  "id",
-  "text",
-  "user_id",
-  "user_name",
-  "user_screen_name",
-  "user_location",
-  "user_followers_count",
-  "user_friends_count",
-  "user_created_at",
-  "user_time_zone",
-  "user_profile_background_color",
-  "user_profile_image_url",
-  "geo",
-  "coordinates",
-  "place"
-]
-
 // Hits the server interface for populating MongoDB with Tweets
 function writeTweetsAPI (params) {
 
@@ -68,7 +40,7 @@ function readTweetsAPI (params) {
 // Loading Component
 Vue.component('loading-card', {
   template: `
-    <div class='card card-body bg-dark text-light border-light text-center d-flex justify-content-center align-items-center'>
+    <div class='card card-body bg-dark t border-light text-center d-flex justify-content-center align-items-center'>
       <i class='fa fa-fw fa-spin fa-2x my-4 fa-spinner'></i>
     </div>
   `
@@ -114,13 +86,13 @@ Vue.component('tweet-list', {
   props: ['tweets', 'fetched'],
   template: `
     <ul class='list-group'>
-      <li class='list-group-item border-light' v-for="t in tweets" :key="t.id_str" :style=" 'background-color: #' + t.user_profile_background_color || '#333333' + ';' ">
+      <li class='list-group-item border-light' v-for="t in tweets" :key="t.tweet_id">
         <div class='row d-flex flex-row h-100'>
           <div class='col-sm-1 d-flex flex-column justify-content-center align-items-center'>
-            <img class='profile-img' :src='t.user_profile_image_url'>
+            <img class='profile-img' :src='t.user.profile_image_url'>
           </div>
-          <div class='col-sm-11 d-flex flex-column justify-content-center'>
-            <a target='_blank' :href='"https://twitter.com/i/web/status/" + t.id_str'>{{t.text}}</a>
+          <div class='col-sm-11 d-flex flex-column justify-content-center text-dark'>
+            {{t.text}}
           </div>
         </div>
       </li>

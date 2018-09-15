@@ -14,51 +14,19 @@ const twitterClient = new Twitter({
 
 // // // //
 
-// Array of attribute names to be inserted into MongoDB
-const EXPORT_ATTRS = [
-  "created_at",
-  "id",
-  "text",
-  "user_id",
-  "user_name",
-  "user_screen_name",
-  "user_location",
-  "user_followers_count",
-  "user_friends_count",
-  "user_created_at",
-  "user_time_zone",
-  "user_profile_background_color",
-  "user_profile_image_url",
-  "geo",
-  "coordinates",
-  "place",
-  "query"
-]
-
 // formatTweetData
 // Isolates the desired data to be exported by the exportTweets function
 function formatTweetData(tweet, query) {
 
-  // Pulls all keys out of tweet.user
-  // and assigns to the root object with the `user_` prefix
-  _.each(tweet.user, (v, k) => {
-    key = 'user_' + k
-    tweet[key] = v
-  })
-
-  // Deletes tweet.user
-  delete tweet.user
-
-  // Assigns tweet_id and deletes original id
-  tweet.tweet_id = tweet.id
-  delete tweet.id
-
   // Assigns query to tweet for easy retrieval
   tweet.query = query.search
 
-  // Returns the tweet with ONLY the attributes we want to export
-  return _.pick(tweet, EXPORT_ATTRS)
+  // Stores tweet.id elsewhere (`id` is reserved)
+  tweet.tweet_id = tweet.id_str
+  delete tweet.id_str
 
+  // Returns the tweet with ONLY the attributes we want to export
+  return tweet
 }
 
 // openTwitterStream
@@ -72,14 +40,14 @@ function openTwitterStream (query) {
   // Opens up a Twitter stream
   const stream = twitterClient.stream('statuses/filter', { track: query.search });
 
-  // Defines an array to store the tweets pulled from the TwitterClient stream
-  let tweets = [];
+  // Track the number of tweets ingested
+  let tweetCount = 0;
 
   // Stream `data` event handler
   stream.on('data', (event) => {
 
     // Stores the tweet
-    tweets.push(event);
+    tweetCount = tweetCount + 1;
 
     // Formats the data
     const tweet = formatTweetData(event, query);
@@ -96,7 +64,7 @@ function openTwitterStream (query) {
     })
 
     // Closes the stream and writes the file when the requisite number of tweets have been collected
-    if (tweets.length === Number(query.count)) {
+    if (tweetCount === Number(query.count)) {
 
       // Destroys the Twitter stream
       stream.destroy();

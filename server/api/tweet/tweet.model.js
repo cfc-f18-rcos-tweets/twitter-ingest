@@ -20,35 +20,14 @@ const Tweet = new Schema(
     text: {
       type: String
     },
-    user_id: {
-      type: Number
+    user: {
+      type: Schema.Types.Mixed
     },
-    user_name: {
-      type: String
+    place: {
+      type: Schema.Types.Mixed
     },
-    user_screen_name: {
-      type: String
-    },
-    user_location: {
-      type: String
-    },
-    user_followers_count: {
-      type: Number
-    },
-    user_friends_count: {
-      type: Number
-    },
-    user_created_at: {
-      type: Date
-    },
-    user_time_zone: {
-      type: String
-    },
-    user_profile_background_color: {
-      type: String
-    },
-    user_profile_image_url: {
-      type: String
+    entities: {
+      type: Schema.Types.Mixed
     },
     geo: {
       type: Schema.Types.Mixed

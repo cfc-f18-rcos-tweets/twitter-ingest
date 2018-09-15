@@ -7,7 +7,7 @@ const controller = require('./tweet.controller');
 // GET /tweets
 router.get('/', controller.list);
 
-// POST /tweets
+// POST /tweets (ingest)
 router.post('/', controller.create);
 
 // // // //
