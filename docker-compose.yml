@@ -4,16 +4,26 @@ services:
 
   mongo:
     image: mongo
-    container_name: websys_mongo
+    container_name: ibm_hack_mongo
     ports:
       - "27017:27017"
 
   mongo_admin:
     image: mongo-express
-    container_name: websys_mongo_admin
+    container_name: ibm_hack_mongo_admin
     depends_on:
       - mongo
     links:
       - mongo
     ports:
       - "8081:8081"
+
+  jupyter:
+    build: ./jupyter
+    container_name: 'ibm_hack_jupyter'
+    depends_on:
+      - mongo
+    links:
+      - mongo
+    ports:
+      - "8888:8888"
