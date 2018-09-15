@@ -5,4 +5,4 @@ FROM jupyter/datascience-notebook
 COPY AnalyzeThis.ipynb /home/jovyan/AnalyzeThis.ipynb
 
 # Installs pymongo
-RUN pip install pymongo
+# RUN pip install pymongo
