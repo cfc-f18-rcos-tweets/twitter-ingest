@@ -10,10 +10,9 @@
 
 - View the application at `localhost:3000` and the MongoExpress admin interface at `localhost:8081`
 
-
 **Notes:**
 
-I used [mongoose](https://github.com/Automattic/mongoose) as a means to connect with MongoDB and define a schema for the tweets data we want to store. I used the `Schema.insertMany()` method provided by mongoose to quickly insert multiple documents into the database, rather than doing `Schema.create()` for each tweet.
+I used [mongoose](https://github.com/Automattic/mongoose) as a means to connect with MongoDB and define a schema for the tweets data we want to store in Node.js.
 
 When querying for tweets, I pull the data from MongoDB in descending order of `createdAt` so the newest tweets in the database will be displayed first.
 

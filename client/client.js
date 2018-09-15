@@ -94,7 +94,7 @@ Vue.component('tweets-form', {
 
       <div class='col-sm-3'>
         <button class="btn btn-primary btn-lg btn-block" @click="onClickFetch()" :disabled="disableFetch" >
-          Fetch
+          Ingest Tweets
           <i class='fa fa-fw fa-twitter ml-2'></i>
         </button>
       </div>
@@ -102,7 +102,7 @@ Vue.component('tweets-form', {
       <div class='col-sm-3'>
         <button class="btn btn-success btn-lg btn-block" @click="onClickRead()" :disabled="disableFetch" >
           <i class='fa fa-fw fa-twitter fa-flip-horizontal mr-2'></i>
-          Read
+          Read Tweets
         </button>
       </div>
 
