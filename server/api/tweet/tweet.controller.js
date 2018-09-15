@@ -35,32 +35,30 @@ const EXPORT_ATTRS = [
   "query"
 ]
 
-// formatTweetsData
+// formatTweetData
 // Isolates the desired data to be exported by the exportTweets function
-function formatTweetsData (tweets, query) {
-  return tweets.map((t) => {
+function formatTweetData(tweet, query) {
 
-    // Pulls all keys out of tweet.user
-    // and assigns to the root object with the `user_` prefix
-    _.each(t.user, (v, k) => {
-      key = 'user_' + k
-      t[key] = v
-    })
-
-    // Deletes tweet.user
-    delete t.user
-
-    // Assigns tweet_id and deletes original id
-    t.tweet_id = t.id
-    delete t.id
-
-    // Assigns query to tweet for easy retrieval
-    t.query = query.search
-
-    // Returns the tweet with ONLY the attributes we want to export
-    return _.pick(t, EXPORT_ATTRS)
-
+  // Pulls all keys out of tweet.user
+  // and assigns to the root object with the `user_` prefix
+  _.each(tweet.user, (v, k) => {
+    key = 'user_' + k
+    tweet[key] = v
   })
+
+  // Deletes tweet.user
+  delete tweet.user
+
+  // Assigns tweet_id and deletes original id
+  tweet.tweet_id = tweet.id
+  delete tweet.id
+
+  // Assigns query to tweet for easy retrieval
+  tweet.query = query.search
+
+  // Returns the tweet with ONLY the attributes we want to export
+  return _.pick(tweet, EXPORT_ATTRS)
+
 }
 
 // openTwitterStream
@@ -68,8 +66,8 @@ function formatTweetsData (tweets, query) {
 function openTwitterStream (query) {
 
   // Defines default query.search & query.count
-  query.search = query.search || 'facebook';
-  query.count = query.count || 10;
+  query.search = query.search || 'florence';
+  query.count = query.count || 1000000;
 
   // Opens up a Twitter stream
   const stream = twitterClient.stream('statuses/filter', { track: query.search });
@@ -83,28 +81,25 @@ function openTwitterStream (query) {
     // Stores the tweet
     tweets.push(event);
 
+    // Formats the data
+    const tweet = formatTweetData(event, query);
+
+    // Saves the tweet to the database
+    Tweet.create(tweet)
+    .then((mongooseDocument) => {
+      // Logs success message to console
+      console.info(`CREATED "${query.search}" TWEET`)
+    })
+    .catch((err) => {
+      // Throws error
+      throw error;
+    })
+
     // Closes the stream and writes the file when the requisite number of tweets have been collected
     if (tweets.length === Number(query.count)) {
 
       // Destroys the Twitter stream
       stream.destroy();
-
-      // Writes the tweets to MongoDB
-      tweets = formatTweetsData(tweets, query)
-
-      // Mongoose bulk insert
-      Tweet.insertMany(tweets)
-      .then((mongooseDocuments) => {
-
-        // Logs success message to console
-        console.info(`CREATED ${query.count} "${query.search}" TWEETS `)
-      })
-      .catch((err) => {
-
-        // Throws error
-        throw error;
-
-      })
 
     }
 
@@ -135,7 +130,7 @@ function openTwitterStream (query) {
 */
 module.exports.list = (req, res, next) => {
     return Tweet
-    .find({ query: req.query.search || 'facebook' }, '-_id -query')
+    .find({ query: req.query.search || 'florence' }, '-_id -query')
     .sort({ 'createdOn': -1 })
     .limit(Number(req.query.count || 10))
     .exec()

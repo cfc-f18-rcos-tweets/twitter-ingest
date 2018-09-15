@@ -110,42 +110,6 @@ Vue.component('tweets-form', {
   `
 });
 
-// Export Form Component
-Vue.component('export-form', {
-  props: ['onClick', 'enabled', 'exportParams'],
-  computed: {
-    exportOptions () {
-      return [EXPORT_JSON, EXPORT_CSV, EXPORT_XML]
-    }
-  },
-  template: `
-    <div class='row'>
-
-      <div class='col-sm-3'>
-        <div class='form-group'>
-          <select class='form-control form-control-lg' v-model="exportParams.format">
-            <option v-for="opt in exportOptions" :value="opt">{{ opt }}</option>
-          </select>
-        </div>
-      </div>
-
-      <div class='col-sm-3'>
-        <div class='form-group'>
-          <input class='form-control form-control-lg' v-model="exportParams.filename">
-        </div>
-      </div>
-
-      <div class='col-sm-6'>
-        <button class="btn btn-light btn-lg btn-block" @click="onClick()" :disabled="!enabled" >
-          <i class='fa fa-fw fa-download mr-2'></i>
-          Export Tweets
-        </button>
-      </div>
-
-    </div>
-  `
-});
-
 Vue.component('tweet-list', {
   props: ['tweets', 'fetched'],
   template: `
@@ -187,7 +151,7 @@ Vue.component('app-layout', {
         <div class='row align-items-center'>
           <div class='col-sm-6'>
             <h2>
-              Download Tweets
+              Disaster Tweets
             </h2>
           </div>
           <div class='col-sm-6 d-flex align-items-center justify-content-end'>
@@ -201,7 +165,6 @@ Vue.component('app-layout', {
         <hr class='border-light' />
 
         <tweets-form :params="params" :onClickFetch="writeTweets" :onClickRead="readTweets" :enabled="formEnabled" :disableFetch="disableFetch" />
-        <export-form :onClick="exportTweets" :exportParams="exportParams" :enabled="exportEnabled" />
 
       </div>
 
@@ -220,13 +183,9 @@ Vue.component('app-layout', {
       fetched: false,
       fetching: false,
       error: false,
-      exportParams: {
-        format: EXPORT_XML,
-        filename: 'tweet-export'
-      },
       params: {
-        count: 10,
-        search: 'facebook' // Default search
+        count: 1000,
+        search: 'florence' // Default search
       }
     }
   },
@@ -236,9 +195,6 @@ Vue.component('app-layout', {
     },
     disableFetch () {
       return !this.params.search
-    },
-    exportEnabled () {
-      return this.fetched === true && this.tweets.length > 0;
     }
   },
   methods: {
@@ -294,80 +250,6 @@ Vue.component('app-layout', {
       .catch((err) => {
         this.error = true;
       })
-    },
-
-    // exportTweets
-    exportTweets () {
-
-      // Isolates data for export
-      let data = this.tweets
-
-      // Variables to store the download's mimetype
-      let mimetype = '';
-      let exportContents = '';
-
-      // Export JSON
-      if (this.exportParams.format === EXPORT_JSON) {
-
-        // Filename & Mimetype
-        filename = this.exportParams.filename + '.json';
-        mimetype = EXPORT_JSON_MIMETYPE;
-
-        // Stringifies JSON, indents 2 spaces
-        exportContents = JSON.stringify(data, null, 2);
-
-      }
-
-      // Export XML
-      else if (this.exportParams.format === EXPORT_XML) {
-
-        // Filename & Mimetype
-        filename = this.exportParams.filename + '.xml';
-        mimetype = EXPORT_XML_MIMETYPE;
-
-        // Instantiates new X2JS class
-        let xmlWriter = new X2JS();
-
-        // Stringifies JSON as XML
-        exportContents = xmlWriter.json2xml_str(data);
-
-      }
-
-      // Export CSV
-      else {
-
-        // Filename & Mimetype
-        filename = this.exportParams.filename + '.csv';
-        mimetype = EXPORT_CSV_MIMETYPE;
-
-        // Assembles CSV header, wraps each header in double-quotes
-        let header = EXPORT_ATTRS.map((h) => { return '"' + h + '"' });
-
-        // Assembles CSV body
-        let body = data.map((t) => {
-
-          // Stores each CSV rowq
-          let row = [];
-
-          // Wraps each row value in double-quotes
-          _.each(t, (v, k) => { row.push('"' + v + '"') });
-
-          // Returns a string representation of the data, comma-delimited
-          return row.join(', ');
-
-        })
-
-        // Assemlbes exportContents with header and body
-        exportContents = header.join(', ');
-        exportContents += "\n";
-        exportContents += body.join("\n");
-
-      }
-
-      // Download.js file download helper function
-      download(exportContents, filename, mimetype);
-
     }
-
   }
 });
